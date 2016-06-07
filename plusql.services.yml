@@ -1,0 +1,9 @@
+services:
+  plusql.registry:
+    class: MakinaCorpus\PluSQL\ConstraintRegistry
+  plusql.constraint.mysql.fk:
+    class: MakinaCorpus\PluSQL\MySQL\MySQLForeignKey
+    tags: [{name: plusql.constraint, type: fk, driver: mysql}]
+  plusql.constraint.pgsql.fk:
+    class: MakinaCorpus\PluSQL\PgSQL\PgSQLForeignKey
+    tags: [{name: plusql.constraint, type: fk, driver: pgsql}]

@@ -11,14 +11,13 @@ trait MySQLConstraintTrait
     /**
      * {@inheritdoc}
      */
-    public function exists($table, $name)
+    protected function existsWithName($table, $name)
     {
-        $constaintName = $this->getSqlName($table, $name);
         $query = <<<EOT
 SELECT 1 FROM information_schema.TABLE_CONSTRAINTS
 WHERE
    CONSTRAINT_SCHEMA = DATABASE() AND
-   CONSTRAINT_NAME   = '$constaintName'
+   CONSTRAINT_NAME   = '$name'
 ;
 EOT;
 

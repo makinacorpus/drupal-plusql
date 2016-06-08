@@ -4,8 +4,9 @@
  * PluSQL Drupal module.
  */
 
-use MakinaCorpus\PluSQL\ConstraintExistsException;
+use MakinaCorpus\PluSQL\Constraint;
 use MakinaCorpus\PluSQL\ConstraintDoesNotExistsException;
+use MakinaCorpus\PluSQL\ConstraintExistsException;
 use MakinaCorpus\PluSQL\ConstraintRegistry;
 use MakinaCorpus\PluSQL\MySQL\MySQLForeignKey;
 use MakinaCorpus\PluSQL\PgSQL\PgSQLForeignKey;
@@ -24,10 +25,10 @@ function _plusql_constraint_get() {
   if (!$instance) {
     $instance = new ConstraintRegistry([
       'mysql' => [
-        'fk' => MySQLForeignKey::class,
+        Constraint::FOREIGN_KEY => MySQLForeignKey::class,
       ],
       'pgsql' => [
-        'fk' => PgSQLForeignKey::class,
+        Constraint::FOREIGN_KEY => PgSQLForeignKey::class,
       ],
     ]);
   }
@@ -51,6 +52,22 @@ function db_constraint_exists($table, $type, $name) {
 }
 
 /**
+ * Does constraint exists on table (does not prefix the constraint name).
+ *
+ * @param string $table
+ *   Table name.
+ * @param string $type
+ *   Constraint type.
+ * @param string $name
+ *   Constraint name.
+ *
+ * @return boolean
+ */
+function db_constraint_exists_unsafe($table, $type, $name) {
+  return _plusql_constraint_get()->get(\Database::getConnection(), $type)->existsUnsafe($table, $name);
+}
+
+/**
  * Drop constraint from table.
  *
  * @param string $table
@@ -62,6 +79,20 @@ function db_constraint_exists($table, $type, $name) {
  */
 function db_constraint_drop($table, $type, $name) {
   _plusql_constraint_get()->get(\Database::getConnection(), $type)->drop($table, $name);
+}
+
+/**
+ * Drop constraint from table (does not prefix the constraint name).
+ *
+ * @param string $table
+ *   Table name.
+ * @param string $type
+ *   Constraint type.
+ * @param string $name
+ *   Constraint name.
+ */
+function db_constraint_drop_unsafe($table, $type, $name) {
+  _plusql_constraint_get()->get(\Database::getConnection(), $type)->dropUnsafe($table, $name);
 }
 
 /**
@@ -93,7 +124,7 @@ function db_constraint_add($table, $type, $name, $definition) {
  */
 function db_constraint_add_all($table, array $definition) {
   $registry = _plusql_constraint_get();
-  foreach ($registry->getAll() as $constraint) {
+  foreach ($registry->getAll(\Database::getConnection()) as $constraint) {
     foreach ($constraint->findAllInTable($table, $definition) as $name => $definition) {
       try {
         if (!$constraint->exists($table, $name)) {
@@ -116,7 +147,7 @@ function db_constraint_add_all($table, array $definition) {
  */
 function db_constraint_drop_all($table, array $definition) {
   $registry = _plusql_constraint_get();
-  foreach ($registry->getAll() as $constraint) {
+  foreach ($registry->getAll(\Database::getConnection()) as $constraint) {
     foreach ($constraint->findAllInTable($table, $definition) as $name => $definition) {
       try {
         if ($constraint->exists($table, $name)) {

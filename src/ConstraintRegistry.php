@@ -74,12 +74,14 @@ class ConstraintRegistry
      *
      * @return ConstraintInterface[]
      */
-    public function getAll()
+    public function getAll(\DatabaseConnection $connection)
     {
-        foreach (array_keys($this->registry) as $type) {
-            $this->get($type);
+        foreach ($this->registry as $types) {
+            foreach (array_keys($types) as $type) {
+                $this->get($connection, $type);
+            }
         }
 
-        return $this->instances;
+        return $this->instances[$connection->driver()];
     }
 }

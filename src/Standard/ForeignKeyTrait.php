@@ -79,13 +79,9 @@ trait ForeignKeyTrait
         $columns = implode(', ', array_keys($definition['columns']));
         $foreignColumns = implode(', ', $definition['columns']);
 
-        $query = <<<EOT
-ALTER TABLE {{$table}}
-    ADD CONSTRAINT {{$constraintName}}
-    FOREIGN KEY ({$columns}) REFERENCES {{$foreignTable}} ({$foreignColumns})
-    $suffix
-EOT;
+        $query = "ALTER TABLE {{$table}} ADD CONSTRAINT {{$constraintName}} FOREIGN KEY ({$columns}) REFERENCES {{$foreignTable}} ({$foreignColumns}) $suffix";
 
+var_dump($query);
         try {
             $this->getConnection()->query($query);
         } catch (\PDOException $e) {
@@ -109,10 +105,16 @@ EOT;
      */
     public function findAllInTable($table, array $definition)
     {
-        if (isset($definition['foreign keys'])) {
-            return $definition['foreign keys'];
-        }
+        $ret = [];
 
-        return [];
+        if (isset($definition['foreign keys'])) {
+            foreach ($definition['foreign keys'] as $name => $item) {
+                if (isset($item['delete'])) {
+                    $ret[$name] = $definition['foreign keys'][$name];
+                }
+            }
+        }
+var_dump($ret);
+        return $ret;
     }
 }

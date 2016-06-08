@@ -16,10 +16,8 @@ class MySQLForeignKey implements ConstraintInterface
     /**
      * {@inheritdoc}
      */
-    public function drop($table, $name)
+    protected function dropWithName($table, $name)
     {
-        $constraintName = $this->getSqlName($table, $name);
-
-        $this->getConnection()->query("ALTER TABLE {{$table}} DROP FOREIGN KEY {{$constraintName}}");
+        $this->getConnection()->query("ALTER TABLE {{$table}} DROP FOREIGN KEY {{$name}}");
     }
 }

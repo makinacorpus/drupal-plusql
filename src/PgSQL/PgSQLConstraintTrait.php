@@ -11,10 +11,9 @@ trait PgSQLConstraintTrait
     /**
      * {@inheritdoc}
      */
-    public function exists($table, $name)
+    public function existsWithName($table, $name)
     {
-        $constaintName = $this->getSqlName($table, $name);
-        $query = "SELECT 1 FROM pg_constraint WHERE conname = '$constaintName'";
+        $query = "SELECT 1 FROM pg_constraint WHERE conname = '$name'";
 
         return (bool)$this->getConnection()->query($query)->fetchField();
     }

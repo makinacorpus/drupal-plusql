@@ -5,6 +5,7 @@ namespace MakinaCorpus\PluSQL\Tests;
 use MakinaCorpus\PluSQL\ConstraintRegistry;
 use MakinaCorpus\PluSQL\MySQL\MySQLForeignKey;
 use MakinaCorpus\PluSQL\PgSQL\PgSQLForeignKey;
+use MakinaCorpus\PluSQL\Constraint;
 
 /**
  * Tests need to happen within a Drupal environement, we don't need it to be
@@ -130,10 +131,10 @@ trait ConstraintTestTrait
 
         $this->constraintRegistry = new ConstraintRegistry([
             'mysql' => [
-                'fk' => MySQLForeignKey::class,
+                Constraint::FOREIGN_KEY => MySQLForeignKey::class,
             ],
             'pgsql' => [
-                'fk' => PgSQLForeignKey::class,
+                Constraint::FOREIGN_KEY => PgSQLForeignKey::class,
             ],
         ]);
 

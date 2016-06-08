@@ -46,7 +46,7 @@ interface ConstraintInterface
     public function add($table, $name, $definition);
 
     /**
-     * Get SQL constraint name
+     * Drop SQL constraint
      *
      * @param string $table
      *   Table name.
@@ -58,7 +58,19 @@ interface ConstraintInterface
     public function drop($table, $name);
 
     /**
-     * Get SQL constraint name
+     * Drop SQL constraint without prefixing name
+     *
+     * @param string $table
+     *   Table name.
+     * @param string $name
+     *   Constraint name.
+     *
+     * @return string
+     */
+    public function dropUnsafe($table, $name);
+
+    /**
+     * Does this contstraint exist
      *
      * @param string $table
      *   Table name.
@@ -68,6 +80,18 @@ interface ConstraintInterface
      * @return string
      */
     public function exists($table, $name);
+
+    /**
+     * Does this contstraint exist without prefixing name
+     *
+     * @param string $table
+     *   Table name.
+     * @param string $name
+     *   Constraint name.
+     *
+     * @return string
+     */
+    public function existsUnsafe($table, $name);
 
     /**
      * Find all constraints in given table.

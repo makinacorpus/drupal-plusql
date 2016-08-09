@@ -81,7 +81,6 @@ trait ForeignKeyTrait
 
         $query = "ALTER TABLE {{$table}} ADD CONSTRAINT {{$constraintName}} FOREIGN KEY ({$columns}) REFERENCES {{$foreignTable}} ({$foreignColumns}) $suffix";
 
-var_dump($query);
         try {
             $this->getConnection()->query($query);
         } catch (\PDOException $e) {
@@ -113,8 +112,8 @@ var_dump($query);
                     $ret[$name] = $definition['foreign keys'][$name];
                 }
             }
-        }
-var_dump($ret);
+	}
+
         return $ret;
     }
 }

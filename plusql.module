@@ -115,6 +115,33 @@ function db_constraint_add($table, $type, $name, $definition) {
 }
 
 /**
+ * Install all constraints for the given module.
+ *
+ * @param string $module
+ *   Module name.
+ */
+function db_constraint_fix($module) {
+  if (!module_exists($module)) {
+    return; // @todo Should it remain silent?
+  }
+  foreach (drupal_get_schema_unprocessed($module) as $table => $definition) {
+    db_constraint_add_all($table, $definition);
+  }
+}
+
+/**
+ * Uninstall all constraints for the given module.
+ *
+ * @param string $module
+ *   Module name.
+ */
+function db_constraint_unfix($module) {
+  foreach (drupal_get_schema_unprocessed($module) as $table => $definition) {
+    db_constraint_drop_all($table, $definition);
+  }
+}
+
+/**
  * Ensure constraints on table definition.
  *
  * @param string $table

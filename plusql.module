@@ -125,7 +125,9 @@ function db_constraint_fix($module) {
     return; // @todo Should it remain silent?
   }
   foreach (drupal_get_schema_unprocessed($module) as $table => $definition) {
-    db_constraint_add_all($table, $definition);
+    if (db_table_exists($table)) {
+      db_constraint_add_all($table, $definition);
+    }
   }
 }
 
@@ -137,7 +139,9 @@ function db_constraint_fix($module) {
  */
 function db_constraint_unfix($module) {
   foreach (drupal_get_schema_unprocessed($module) as $table => $definition) {
-    db_constraint_drop_all($table, $definition);
+    if (db_table_exists($table)) {
+      db_constraint_drop_all($table, $definition);
+    }
   }
 }
 

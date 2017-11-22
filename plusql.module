@@ -124,7 +124,37 @@ function db_constraint_fix($module) {
   if (!module_exists($module)) {
     return; // @todo Should it remain silent?
   }
-  foreach (drupal_get_schema_unprocessed($module) as $table => $definition) {
+  $schema = drupal_get_schema_unprocessed($module);
+  if (!$schema) {
+    return; // @todo Should it remain silent?
+  }
+  foreach ($schema as $table => $definition) {
+    if (db_table_exists($table)) {
+      db_constraint_add_all($table, $definition);
+    }
+  }
+}
+
+/**
+ * Install all constraints for the given module, using processed schema.
+ *
+ * @param string $module
+ *   Module name.
+ */
+function db_constraint_fix_processed($module) {
+  if (!module_exists($module)) {
+    return; // @todo Should it remain silent?
+  }
+  $schema = [];
+  foreach (array_keys(drupal_get_schema_unprocessed($module)) as $table) {
+    if ($definition = drupal_get_schema($table)) {
+      $schema[$table] = $definition;
+    }
+  }
+  if (!$schema) {
+    return; // @todo Should it remain silent?
+  }
+  foreach ($schema as $table => $definition) {
     if (db_table_exists($table)) {
       db_constraint_add_all($table, $definition);
     }

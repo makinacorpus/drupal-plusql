@@ -2,6 +2,8 @@
 
 namespace MakinaCorpus\PluSQL;
 
-class ConstraintDoesNotExistsException extends \DatabaseSchemaObjectDoesNotExistException
+use Drupal\Core\Database\SchemaObjectDoesNotExistException;
+
+class ConstraintDoesNotExistsException extends SchemaObjectDoesNotExistException
 {
 }

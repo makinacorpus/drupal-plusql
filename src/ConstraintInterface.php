@@ -2,21 +2,19 @@
 
 namespace MakinaCorpus\PluSQL;
 
+use Drupal\Core\Database\Connection;
+
 interface ConstraintInterface
 {
     /**
      * Get connection
-     *
-     * @return \DatabaseConnection
      */
-    public function getConnection();
+    public function getConnection(): Connection;
 
     /**
      * Get type
-     *
-     * @return string
      */
-    public function getType();
+    public function getType(): string;
 
     /**
      * Get SQL constraint name
@@ -28,7 +26,7 @@ interface ConstraintInterface
      *
      * @return string
      */
-    public function getSqlName($table, $name);
+    public function getSqlName(string $table, string $name): string;
 
     /**
      * Create constraint
@@ -43,7 +41,7 @@ interface ConstraintInterface
      *   upon the implementation. This allows to set arbitrary constraint strings
      *   using the 'arbitrary' type.
      */
-    public function add($table, $name, $definition);
+    public function add(string $table, string $name, $definition);
 
     /**
      * Drop SQL constraint
@@ -52,10 +50,8 @@ interface ConstraintInterface
      *   Table name.
      * @param string $name
      *   Constraint name.
-     *
-     * @return string
      */
-    public function drop($table, $name);
+    public function drop(string $table, string $name);
 
     /**
      * Drop SQL constraint without prefixing name
@@ -64,10 +60,8 @@ interface ConstraintInterface
      *   Table name.
      * @param string $name
      *   Constraint name.
-     *
-     * @return string
      */
-    public function dropUnsafe($table, $name);
+    public function dropUnsafe(string $table, string $name);
 
     /**
      * Does this contstraint exist
@@ -77,9 +71,9 @@ interface ConstraintInterface
      * @param string $name
      *   Constraint name.
      *
-     * @return string
+     * @return bool
      */
-    public function exists($table, $name);
+    public function exists(string $table, string $name): bool;
 
     /**
      * Does this contstraint exist without prefixing name
@@ -89,15 +83,17 @@ interface ConstraintInterface
      * @param string $name
      *   Constraint name.
      *
-     * @return string
+     * @return bool
      */
-    public function existsUnsafe($table, $name);
+    public function existsUnsafe(string $table, string $name): bool;
 
     /**
      * Find all constraints in given table.
      *
      * @param string $table
      * @param array $definition
+     *
+     * @return array
      */
-    public function findAllInTable($table, array $definition);
+    public function findAllInTable(string $table, array $definition): array;
 }

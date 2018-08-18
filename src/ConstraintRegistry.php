@@ -2,7 +2,9 @@
 
 namespace MakinaCorpus\PluSQL;
 
-class ConstraintRegistry
+use Drupal\Core\Database\Connection;
+
+final class ConstraintRegistry
 {
     private $registry = [];
     private $instances = [];
@@ -15,22 +17,15 @@ class ConstraintRegistry
      *   dimension keys are constraint type names, terminal values are class
      *   names which must implement ConstraintInterface
      */
-    public function __construct($definitions = [])
+    public function __construct(array $definitions = [])
     {
         $this->registry = $definitions;
     }
 
     /**
      * Create instance for the given connection
-     *
-     * @todo allow dynamic or configuration-based registration
-     *
-     * @param \DatabaseConnection $connection
-     * @param string $type
-     *
-     * @return ConstraintInterface
      */
-    protected function createInstance(\DatabaseConnection $connection, $type)
+    protected function createInstance(Connection $connection, string $type): ConstraintInterface
     {
         $driver = $connection->driver();
 
@@ -52,13 +47,8 @@ class ConstraintRegistry
 
     /**
      * Get constraint type handler for driver
-     *
-     * @param \DatabaseConnection $connection
-     * @param string $type
-     *
-     * @return ConstraintInterface
      */
-    public function get(\DatabaseConnection $connection, $type)
+    public function get(Connection $connection, string $type): ConstraintInterface
     {
         $driver = $connection->driver();
 
@@ -74,7 +64,7 @@ class ConstraintRegistry
      *
      * @return ConstraintInterface[]
      */
-    public function getAll(\DatabaseConnection $connection)
+    public function getAll(Connection $connection): array
     {
         foreach ($this->registry as $types) {
             foreach (array_keys($types) as $type) {

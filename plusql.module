@@ -4,6 +4,7 @@
  * PluSQL Drupal module.
  */
 
+use Drupal\Core\Database\Database;
 use MakinaCorpus\PluSQL\Constraint;
 use MakinaCorpus\PluSQL\ConstraintDoesNotExistsException;
 use MakinaCorpus\PluSQL\ConstraintExistsException;
@@ -13,13 +14,8 @@ use MakinaCorpus\PluSQL\PgSQL\PgSQLForeignKey;
 
 /**
  * Get constraint handler for current connection.
- *
- * @param string $type
- *   Constraint type.
- *
- * @return ConstraintRegistry
  */
-function _plusql_constraint_get() {
+function _plusql_constraint_get(): ConstraintRegistry {
   // @todo move this out to something better
   $instance = &drupal_static(__FUNCTION__);
   if (!$instance) {
@@ -45,10 +41,10 @@ function _plusql_constraint_get() {
  * @param string $name
  *   Constraint name.
  *
- * @return boolean
+ * @return bool
  */
-function db_constraint_exists($table, $type, $name) {
-  return _plusql_constraint_get()->get(\Database::getConnection(), $type)->exists($table, $name);
+function db_constraint_exists(string $table, string $type, string $name): bool {
+  return _plusql_constraint_get()->get(Database::getConnection(), $type)->exists($table, $name);
 }
 
 /**
@@ -61,10 +57,10 @@ function db_constraint_exists($table, $type, $name) {
  * @param string $name
  *   Constraint name.
  *
- * @return boolean
+ * @return bool
  */
-function db_constraint_exists_unsafe($table, $type, $name) {
-  return _plusql_constraint_get()->get(\Database::getConnection(), $type)->existsUnsafe($table, $name);
+function db_constraint_exists_unsafe(string $table, string $type, string $name): bool {
+  return _plusql_constraint_get()->get(Database::getConnection(), $type)->existsUnsafe($table, $name);
 }
 
 /**
@@ -77,8 +73,8 @@ function db_constraint_exists_unsafe($table, $type, $name) {
  * @param string $name
  *   Constraint name.
  */
-function db_constraint_drop($table, $type, $name) {
-  _plusql_constraint_get()->get(\Database::getConnection(), $type)->drop($table, $name);
+function db_constraint_drop(string $table, string $type, string $name) {
+  _plusql_constraint_get()->get(Database::getConnection(), $type)->drop($table, $name);
 }
 
 /**
@@ -91,8 +87,8 @@ function db_constraint_drop($table, $type, $name) {
  * @param string $name
  *   Constraint name.
  */
-function db_constraint_drop_unsafe($table, $type, $name) {
-  _plusql_constraint_get()->get(\Database::getConnection(), $type)->dropUnsafe($table, $name);
+function db_constraint_drop_unsafe(string $table, string $type, string $name) {
+  _plusql_constraint_get()->get(Database::getConnection(), $type)->dropUnsafe($table, $name);
 }
 
 /**
@@ -110,8 +106,8 @@ function db_constraint_drop_unsafe($table, $type, $name) {
  *   upon the implementation. This allows to set arbitrary constraint strings
  *   using the 'arbitrary' type.
  */
-function db_constraint_add($table, $type, $name, $definition) {
-  _plusql_constraint_get()->get(\Database::getConnection(), $type)->add($table, $name, $definition);
+function db_constraint_add(string $table, string $type, $name, $definition) {
+  _plusql_constraint_get()->get(Database::getConnection(), $type)->add($table, $name, $definition);
 }
 
 /**
@@ -120,11 +116,11 @@ function db_constraint_add($table, $type, $name, $definition) {
  * @param string $module
  *   Module name.
  */
-function db_constraint_fix($module) {
-  if (!module_exists($module)) {
+function db_constraint_fix(string $module) {
+  if (!\Drupal::moduleHandler()->moduleExists($module)) {
     return; // @todo Should it remain silent?
   }
-  $schema = drupal_get_schema_unprocessed($module);
+  $schema = drupal_get_module_schema($module);
   if (!$schema) {
     return; // @todo Should it remain silent?
   }
@@ -140,13 +136,13 @@ function db_constraint_fix($module) {
  *
  * @param string $module
  *   Module name.
- */
-function db_constraint_fix_processed($module) {
-  if (!module_exists($module)) {
+ *
+function db_constraint_fix_processed(string $module) {
+  if (!\Drupal::moduleHandler()->moduleExists($module)) {
     return; // @todo Should it remain silent?
   }
   $schema = [];
-  foreach (array_keys(drupal_get_schema_unprocessed($module)) as $table) {
+  foreach (array_keys(drupal_get_module_schema($module)) as $table) {
     if ($definition = drupal_get_schema($table)) {
       $schema[$table] = $definition;
     }
@@ -160,6 +156,7 @@ function db_constraint_fix_processed($module) {
     }
   }
 }
+ */
 
 /**
  * Uninstall all constraints for the given module.
@@ -167,8 +164,8 @@ function db_constraint_fix_processed($module) {
  * @param string $module
  *   Module name.
  */
-function db_constraint_unfix($module) {
-  foreach (drupal_get_schema_unprocessed($module) as $table => $definition) {
+function db_constraint_unfix(string $module) {
+  foreach (drupal_get_module_schema($module) as $table => $definition) {
     if (db_table_exists($table)) {
       db_constraint_drop_all($table, $definition);
     }
@@ -183,9 +180,10 @@ function db_constraint_unfix($module) {
  * @param array $definition
  *   Table definition (must be unprocessed).
  */
-function db_constraint_add_all($table, array $definition) {
+function db_constraint_add_all(string $table, array $definition) {
   $registry = _plusql_constraint_get();
-  foreach ($registry->getAll(\Database::getConnection()) as $constraint) {
+  /** @var \MakinaCorpus\PluSQL\ConstraintInterface $constraint */
+  foreach ($registry->getAll(Database::getConnection()) as $constraint) {
     foreach ($constraint->findAllInTable($table, $definition) as $name => $definition) {
       try {
         if (!$constraint->exists($table, $name)) {
@@ -206,9 +204,10 @@ function db_constraint_add_all($table, array $definition) {
  * @param array $definition
  *   Table definition (must be unprocessed).
  */
-function db_constraint_drop_all($table, array $definition) {
+function db_constraint_drop_all(string $table, array $definition) {
   $registry = _plusql_constraint_get();
-  foreach ($registry->getAll(\Database::getConnection()) as $constraint) {
+  /** @var \MakinaCorpus\PluSQL\ConstraintInterface $constraint */
+  foreach ($registry->getAll(Database::getConnection()) as $constraint) {
     foreach ($constraint->findAllInTable($table, $definition) as $name => $definition) {
       try {
         if ($constraint->exists($table, $name)) {

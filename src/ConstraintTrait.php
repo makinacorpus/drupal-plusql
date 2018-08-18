@@ -2,6 +2,8 @@
 
 namespace MakinaCorpus\PluSQL;
 
+use Drupal\Core\Database\Connection;
+
 /**
  * Default implementation matches
  */
@@ -11,12 +13,9 @@ trait ConstraintTrait
     private $connection;
 
     /**
-     * Defautl constructor
-     *
-     * @param \DatabaseConnection $connection
-     * @param string $type
+     * Default constructor
      */
-    public function __construct(\DatabaseConnection $connection, $type)
+    public function __construct(Connection $connection, string $type)
     {
         $this->connection = $connection;
         $this->type = $type;
@@ -24,53 +23,37 @@ trait ConstraintTrait
 
     /**
      * Get connection
-     *
-     * @return \DatabaseConnection
      */
-    final public function getConnection()
+    final public function getConnection(): Connection
     {
         return $this->connection;
     }
 
     /**
      * Get type
-     *
-     * @return string
      */
-    final public function getType()
+    final public function getType(): string
     {
         return $this->type;
     }
 
     /**
      * Get SQL constraint name
-     *
-     * @param string $table
-     *   Table name.
-     * @param string $name
-     *   Constraint name.
-     *
-     * @return string
      */
-    public function getSqlName($table, $name)
+    public function getSqlName(string $table, string $name): string
     {
         return $table . '_' . $this->getType() . '_' . $name;
     }
 
     /**
      * Doe the constraint with given name exists (please do not prefix)
-     *
-     * @param string $table
-     * @param string $name
-     *
-     * @return boolean
      */
-    abstract protected function existsWithName($table, $name);
+    abstract protected function existsWithName(string $table, string $name): bool;
 
     /**
      * {@inheritdoc}
      */
-    final public function exists($table, $name)
+    final public function exists(string $table, string $name): bool
     {
         return $this->existsWithName($table, $this->getSqlName($table, $name));
     }
@@ -78,18 +61,15 @@ trait ConstraintTrait
     /**
      * {@inheritdoc}
      */
-    final public function existsUnsafe($table, $name)
+    final public function existsUnsafe(string $table, string $name): bool
     {
         return $this->existsWithName($table, $name);
     }
 
     /**
      * Drop constraint with given name (please do not prefix)
-     *
-     * @param string $table
-     * @param string $name
      */
-    protected function dropWithName($table, $name)
+    protected function dropWithName(string $table, string $name)
     {
         // This is not fully standard, I guess, but should work with most SQL
         // databases, except MySQL which will never do like the others. Anyway
@@ -100,16 +80,16 @@ trait ConstraintTrait
     /**
      * {@inheritdoc}
      */
-    final public function drop($table, $name)
+    final public function drop(string $table, string $name)
     {
-        return $this->dropWithName($table, $this->getSqlName($table, $name));
+        $this->dropWithName($table, $this->getSqlName($table, $name));
     }
 
     /**
      * {@inheritdoc}
      */
-    final public function dropUnsafe($table, $name)
+    final public function dropUnsafe(string $table, string $name)
     {
-        return $this->dropWithName($table, $name);
+        $this->dropWithName($table, $name);
     }
 }

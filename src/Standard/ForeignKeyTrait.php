@@ -41,7 +41,7 @@ trait ForeignKeyTrait
     /**
      * {@inheritdoc}
      */
-    public function add($table, $name, $definition)
+    public function add(string $table, string $name, $definition)
     {
         if (!is_array($definition)) {
             throw new \InvalidArgumentException("Invalid definition given");
@@ -102,7 +102,7 @@ trait ForeignKeyTrait
     /**
      * {@inheritdoc}
      */
-    public function findAllInTable($table, array $definition)
+    public function findAllInTable(string $table, array $definition): array
     {
         $ret = [];
 
@@ -112,7 +112,7 @@ trait ForeignKeyTrait
                     $ret[$name] = $definition['foreign keys'][$name];
                 }
             }
-	}
+        }
 
         return $ret;
     }

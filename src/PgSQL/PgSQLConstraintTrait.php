@@ -11,7 +11,7 @@ trait PgSQLConstraintTrait
     /**
      * {@inheritdoc}
      */
-    public function existsWithName($table, $name)
+    public function existsWithName(string $table, string $name): bool
     {
         $query = "SELECT 1 FROM pg_constraint WHERE conname = '$name'";
 

@@ -11,7 +11,7 @@ trait MySQLConstraintTrait
     /**
      * {@inheritdoc}
      */
-    protected function existsWithName($table, $name)
+    protected function existsWithName(string $table, string $name): bool
     {
         $query = <<<EOT
 SELECT 1 FROM information_schema.TABLE_CONSTRAINTS

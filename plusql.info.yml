@@ -1,5 +1,5 @@
 name: PluSQL
-type; module
+type: module
 description: Because SQL can do plus
 core: 8.x
 package: Utility
